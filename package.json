@@ -25,6 +25,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "express": "^4.16.4",
     "graphql": "^14.3.0",
+    "merge-graphql-schemas": "^1.5.8",
     "nodemon": "^1.19.0",
     "pg": "^7.11.0",
     "sequelize": "^5.8.5"
