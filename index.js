@@ -2,6 +2,7 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import path from 'path';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
+import cors from 'cors';
 
 import models from './models';
 
@@ -21,6 +22,7 @@ const server = new ApolloServer({
   },
 });
 const app = express();
+app.use(cors('localhost:3001'));
 
 server.applyMiddleware({ app });
 
