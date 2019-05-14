@@ -6,6 +6,9 @@ import cors from 'cors';
 
 import models from './models';
 
+const SECRET = 'javen777';
+const SECRET2 = '777javen';
+
 const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schemas')));
 const resolvers = mergeResolvers(
   fileLoader(path.join(__dirname, './resolvers')),
@@ -19,6 +22,8 @@ const server = new ApolloServer({
     user: {
       id: 1,
     },
+    SECRET,
+    SECRET2,
   },
 });
 const app = express();
