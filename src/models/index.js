@@ -1,12 +1,17 @@
 import Sequelize from 'sequelize';
 
 // create Sequelize instance that connects to PostgresQL database
-const sequelize = new Sequelize('slack_clone', 'J', 'postgres', {
-  dialect: 'postgres',
-  define: {
-    underscored: true,
+const sequelize = new Sequelize(
+  process.env.DATABASE,
+  process.env.DATABASE_USER,
+  process.env.DATABASE_PASSWORD,
+  {
+    dialect: 'postgres',
+    define: {
+      underscored: true,
+    },
   },
-});
+);
 
 const models = {
   User: sequelize['import']('./user'),
