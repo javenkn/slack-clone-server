@@ -3,11 +3,12 @@ import { ApolloServer } from 'apollo-server-express';
 import path from 'path';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 import models from './src/models';
-import { refreshTokens } from './src/helpers/auth';
-import { SECRET, getUser } from './src/helpers/getUser';
+import getUser from './src/helpers/getUser';
+
+const SECRET = process.env.SECRET;
 
 const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './src/schemas')));
 const resolvers = mergeResolvers(
@@ -17,12 +18,12 @@ const resolvers = mergeResolvers(
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => {
+  context: async ({ req }) => {
     // get the user token from the headers
-    const token = req.headers.authorization || '';
+    const tokenWithBearer = req.headers.authorization || '';
+    const token = tokenWithBearer.split(' ')[1];
     // try to retrieve a user with the token
-    const userId = getUser(token);
-
+    const userId = await getUser(token);
     // add the user to the context
     return {
       models,
