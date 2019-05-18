@@ -1,21 +1,11 @@
 import jwt from 'jsonwebtoken';
-const SECRET = 'GraphQL-is-aw3some';
 
-function getUser(reqToken) {
-  if (reqToken) {
-    const token = reqToken.replace('Bearer ', '');
+export default async function(token) {
+  if (token) {
     try {
-      const { userId } = jwt.verify(token, SECRET);
-      return userId;
-    } catch (err) {
-      throw new Error('Not authenticated');
+      return await jwt.verify(token, process.env.SECRET);
+    } catch (e) {
+      throw new AuthenticationError('Your session expired. Sign in again.');
     }
   }
-
-  throw new Error('Not authenticated');
 }
-
-module.exports = {
-  SECRET,
-  getUser,
-};

@@ -8,8 +8,8 @@ export default {
     allUsers: (parent, args, { models }) => models.User.findAll(),
   },
   Mutation: {
-    login: (parent, { email, password }, { models, SECRET, SECRET2 }) =>
-      tryLogin(email, password, models, SECRET, SECRET2),
+    login: (parent, { email, password }, { models, SECRET }) =>
+      tryLogin(email, password, models, SECRET),
     register: async (parent, args, { models }) => {
       try {
         const user = await models.User.create(args);
