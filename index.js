@@ -23,7 +23,7 @@ const server = new ApolloServer({
     const tokenWithBearer = req.headers.authorization || '';
     const token = tokenWithBearer.split(' ')[1];
     // try to retrieve a user with the token
-    const { user } = await getUser(token);
+    const user = await getUser(token);
     // add the user to the context
     return {
       models,
