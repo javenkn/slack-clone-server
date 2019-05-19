@@ -16,8 +16,8 @@ const createResolver = resolver => {
 /**
  * Runs require auth before the childResolver
  */
-export const requiresAuth = createResolver((parent, args, { userId }) => {
-  if (!userId) {
+export const requiresAuth = createResolver((parent, args, { user }) => {
+  if (!user || !user.id) {
     throw new Error('Not authenticated');
   }
 });

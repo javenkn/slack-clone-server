@@ -3,7 +3,7 @@ import _ from 'lodash';
 import bcrypt from 'bcrypt';
 
 export const createToken = async (user, secret) => {
-  return jwt.sign({ userId: user.id }, secret, {
+  return jwt.sign({ user }, secret, {
     expiresIn: '1h',
   });
 };
