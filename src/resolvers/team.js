@@ -1,17 +1,27 @@
+import { combineResolvers } from 'graphql-resolvers';
+
 import formatErrors from '../helpers/formatErrors';
-import { requiresAuth } from '../helpers/permissions';
+import { isAuthenticated } from '../helpers/permissions';
 
 export default {
   Query: {
-    allTeams: requiresAuth.createResolver((parent, args, { models, user }) =>
-      models.Team.findAll({ where: { owner: user.id } }, { raw: true }),
+    allTeams: combineResolvers(
+      isAuthenticated,
+      (parent, args, { models, user }) =>
+        models.Team.findAll({ where: { owner: user.id } }, { raw: true }),
     ),
   },
   Mutation: {
-    createTeam: requiresAuth.createResolver(
+    createTeam: combineResolvers(
+      isAuthenticated,
       async (parent, args, { models, user }) => {
         try {
-          await models.Team.create({ ...args, owner: user.id });
+          const team = await models.Team.create({ ...args, owner: user.id });
+          await models.Channel.create({
+            name: 'general',
+            public: true,
+            teamId: team.id,
+          });
           return {
             ok: true,
           };
