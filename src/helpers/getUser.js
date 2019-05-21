@@ -1,3 +1,4 @@
+import { AuthenticationError } from 'apollo-server-express';
 import jwt from 'jsonwebtoken';
 
 export default async token => {
