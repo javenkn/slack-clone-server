@@ -1,6 +1,8 @@
+import { withFilter } from 'apollo-server';
 import { combineResolvers } from 'graphql-resolvers';
 
 import { isAuthenticated } from '../helpers/permissions';
+import pubsub, { EVENTS } from '../subscription';
 
 export default {
   Query: {
@@ -18,7 +20,14 @@ export default {
       isAuthenticated,
       async (parent, args, { models, user }) => {
         try {
-          await models.Message.create({ ...args, userId: user.id });
+          const message = await models.Message.create({
+            ...args,
+            userId: user.id,
+          });
+          pubsub.publish(EVENTS.MESSAGE.CREATED, {
+            channelId: args.channelId,
+            messageCreated: { ...message.dataValues },
+          });
           return true;
         } catch (error) {
           console.log(error);
@@ -26,6 +35,14 @@ export default {
         }
       },
     ),
+  },
+  Subscription: {
+    messageCreated: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
+        (payload, { channelId }) => payload.channelId === channelId,
+      ),
+    },
   },
   Message: {
     user: ({ userId }, args, { models }) =>

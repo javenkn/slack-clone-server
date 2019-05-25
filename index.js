@@ -54,7 +54,8 @@ models.sequelize
   .then(() =>
     httpServer.listen({ port: 3000 }, () =>
       console.log(
-        `🚀 Server ready at http://localhost:3000${server.graphqlPath}`,
+        `🚀 Server ready at http://localhost:3000${server.graphqlPath}
+🚀 Subscriptions ready at ws://localhost:3000${server.subscriptionsPath}`,
       ),
     ),
   );
