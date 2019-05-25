@@ -10,6 +10,19 @@ export default {
       (parent, args, { models, user }) =>
         models.Team.findAll({ where: { owner: user.id } }, { raw: true }),
     ),
+    memberOfTeams: combineResolvers(
+      isAuthenticated,
+      (parent, args, { models, user }) =>
+        models.Team.findAll(
+          {
+            include: {
+              model: models.User,
+              where: { id: user.id },
+            },
+          },
+          { raw: true },
+        ),
+    ),
   },
   Mutation: {
     addTeamMember: combineResolvers(
@@ -67,20 +80,31 @@ export default {
       isAuthenticated,
       async (parent, args, { models, user }) => {
         try {
-          const team = await models.Team.create({ ...args, owner: user.id });
-          await models.Channel.create({
-            name: 'general',
-            public: true,
-            teamId: team.id,
+          const response = await models.sequelize.transaction(async () => {
+            const team = await models.Team.create({ ...args, owner: user.id });
+            await models.Channel.bulkCreate([
+              {
+                name: 'general',
+                public: true,
+                teamId: team.id,
+              },
+              {
+                name: 'random',
+                public: true,
+                teamId: team.id,
+              },
+            ]);
+            return team;
           });
           return {
             ok: true,
+            team: response,
           };
         } catch (err) {
           console.log(err);
           return {
             ok: false,
-            errors: formatErrors(error, models),
+            errors: formatErrors(err, models),
           };
         }
       },
