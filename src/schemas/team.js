@@ -2,7 +2,7 @@ export default `
   type Team {
     id: ID!
     name: String!
-    owner: User!
+    owner: ID!
     members: [User!]!
     channels: [Channel!]!
   }

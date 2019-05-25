@@ -13,16 +13,24 @@ export default {
     memberOfTeams: combineResolvers(
       isAuthenticated,
       (parent, args, { models, user }) =>
-        models.Team.findAll(
-          {
-            include: {
-              model: models.User,
-              where: { id: user.id },
-            },
-          },
-          { raw: true },
+        models.sequelize.query(
+          'select * from teams join members on id = team_id where user_id = ?',
+          { model: models.Team, replacements: [user.id] },
         ),
     ),
+    // memberOfTeams: combineResolvers(
+    //   isAuthenticated,
+    //   (parent, args, { models, user }) =>
+    //     models.Team.findAll(
+    //       {
+    //         include: {
+    //           model: models.User,
+    //           where: { id: user.id },
+    //         },
+    //       },
+    //       { raw: true },
+    //     ),
+    // ),
   },
   Mutation: {
     addTeamMember: combineResolvers(
