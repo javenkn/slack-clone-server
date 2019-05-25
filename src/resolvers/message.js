@@ -1,4 +1,9 @@
 export default {
+  Query: {
+    messages: async (parent, args, { models, user }) => {
+      return [];
+    },
+  },
   Mutation: {
     createMessage: async (parent, args, { models, user }) => {
       try {
