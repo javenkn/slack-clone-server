@@ -18,6 +18,7 @@ const models = {
   Channel: sequelize['import']('./channel'),
   Team: sequelize['import']('./team'),
   Message: sequelize['import']('./message'),
+  Member: sequelize['import']('./member'),
 };
 
 // loop through the models and for every model check if has an associate method
