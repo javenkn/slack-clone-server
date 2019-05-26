@@ -12,10 +12,10 @@ export default `
   }
 
   type Query {
-    directMessages: [DirectMessage!]!
+    directMessages(teamId: ID!, otherUserId: ID!): [DirectMessage!]!
   }
 
   type Mutation {
-    createDirectMessage(receiverId: ID!, text: String!): Boolean!
+    createDirectMessage(receiverId: ID!, teamId: ID!, text: String!): Boolean!
   }
 `;
