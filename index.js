@@ -45,13 +45,13 @@ const server = new ApolloServer({
       if (token) {
         const user = await getUser(token);
         if (!user) {
-          throw new Error('Invalid auth token.');
+          return { models };
         }
 
-        return true;
+        return { models, user };
       }
 
-      throw new Error('Missing auth token!');
+      return { models };
     },
   },
 });
