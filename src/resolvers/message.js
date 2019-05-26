@@ -41,17 +41,17 @@ export default {
       subscribe: withFilter(
         combineResolvers(
           isAuthenticated,
-          async (parent, { channelId }, { models, user }) => {
+          (parent, { channelId }, { models, user }) => {
             // check if part of team
-            const channel = await models.Channel.findOne({
-              where: { id: channelId },
-            });
-            const member = await models.Member.findOne({
-              where: { teamId: channel.teamId, userId: user.id },
-            });
-            if (!member) {
-              throw new Error('You have to be a member to subscribe.');
-            }
+            // const channel = await models.Channel.findOne({
+            //   where: { id: channelId },
+            // });
+            // const member = await models.Member.findOne({
+            //   where: { teamId: channel.teamId, userId: user.id },
+            // });
+            // if (!member) {
+            //   throw new Error('You have to be a member to subscribe.');
+            // }
             return pubsub.asyncIterator(EVENTS.MESSAGE.CREATED);
           },
         ),
