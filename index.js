@@ -40,6 +40,20 @@ const server = new ApolloServer({
       };
     }
   },
+  subscriptions: {
+    onConnect: async ({ token }, webSocket) => {
+      if (token) {
+        const user = await getUser(token);
+        if (!user) {
+          throw new Error('Invalid auth token.');
+        }
+
+        return true;
+      }
+
+      throw new Error('Missing auth token!');
+    },
+  },
 });
 const app = express();
 app.use(cors('localhost:3001'));
