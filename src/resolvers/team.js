@@ -5,32 +5,14 @@ import { isAuthenticated } from '../helpers/permissions';
 
 export default {
   Query: {
-    allTeams: combineResolvers(
+    getTeamMembers: combineResolvers(
       isAuthenticated,
-      (parent, args, { models, user }) =>
-        models.Team.findAll({ where: { owner: user.id } }, { raw: true }),
-    ),
-    memberOfTeams: combineResolvers(
-      isAuthenticated,
-      (parent, args, { models, user }) =>
+      (parent, { teamId }, { models }) =>
         models.sequelize.query(
-          'select * from teams join members on id = team_id where user_id = ?',
-          { model: models.Team, replacements: [user.id] },
+          'select * from users as u join members as m on m.user_id = u.id where m.team_id = ?',
+          { model: models.User, replacements: [teamId], raw: true },
         ),
     ),
-    // memberOfTeams: combineResolvers(
-    //   isAuthenticated,
-    //   (parent, args, { models, user }) =>
-    //     models.Team.findAll(
-    //       {
-    //         include: {
-    //           model: models.User,
-    //           where: { id: user.id },
-    //         },
-    //       },
-    //       { raw: true },
-    //     ),
-    // ),
   },
   Mutation: {
     addTeamMember: combineResolvers(
