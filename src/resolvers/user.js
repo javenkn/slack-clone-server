@@ -1,10 +1,14 @@
+import { combineResolvers } from 'graphql-resolvers';
+
 import formatErrors from '../helpers/formatErrors';
 import { tryLogin } from '../helpers/auth';
+import { isAuthenticated } from '../helpers/permissions';
 
 export default {
   Query: {
-    getUser: (parent, { id }, { models }) =>
-      models.User.findOne({ where: { id } }),
+    me: combineResolvers(isAuthenticated, (parent, args, { models, user }) =>
+      models.User.findOne({ where: { id: user.id } }),
+    ),
     allUsers: (parent, args, { models }) => models.User.findAll(),
   },
   Mutation: {
@@ -24,5 +28,12 @@ export default {
         };
       }
     },
+  },
+  User: {
+    teams: (parents, args, { models, user }) =>
+      models.sequelize.query(
+        'select * from teams as team join members as member on team.id = member.team_id where member.user_id = ?',
+        { model: models.Team, replacements: [user.id] },
+      ),
   },
 };

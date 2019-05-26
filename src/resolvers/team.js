@@ -90,6 +90,11 @@ export default {
         try {
           const response = await models.sequelize.transaction(async () => {
             const team = await models.Team.create({ ...args, owner: user.id });
+            await models.Member.create({
+              teamId: team.id,
+              userId: user.id,
+              admin: true,
+            });
             await models.Channel.bulkCreate([
               {
                 name: 'general',
