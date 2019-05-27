@@ -9,6 +9,8 @@ export default {
     me: combineResolvers(isAuthenticated, (parent, args, { models, user }) =>
       models.User.findOne({ where: { id: user.id } }),
     ),
+    getUser: (parent, { userId }, { models }) =>
+      models.User.findOne({ where: { id: userId } }),
     allUsers: (parent, args, { models }) => models.User.findAll(),
   },
   Mutation: {

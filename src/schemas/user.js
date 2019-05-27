@@ -8,6 +8,7 @@ export default `
 
   type Query {
     me: User!
+    getUser(userId: ID!): User!
     allUsers: [User!]!
   }
 
