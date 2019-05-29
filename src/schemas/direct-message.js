@@ -8,7 +8,7 @@ export default `
   }
 
   type Subscription {
-    messageCreated(channelId: ID!): Message!
+    directMessageCreated(teamId: ID!, userId: ID!): DirectMessage!
   }
 
   type Query {

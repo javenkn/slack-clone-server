@@ -1,30 +1,28 @@
 import { withFilter } from 'apollo-server';
 import { combineResolvers } from 'graphql-resolvers';
-import Sequelize from 'sequelize';
-const op = Sequelize.Op;
 
 import { isAuthenticated } from '../helpers/permissions';
-// import pubsub, { EVENTS } from '../subscription';
+import pubsub, { EVENTS } from '../subscription';
 
 export default {
   Query: {
     directMessages: combineResolvers(
       isAuthenticated,
-      async (parent, { teamId, otherUserId }, { models, user }) =>
-        models.DirectMessage.findAll(
+      (parent, { teamId, otherUserId }, { models, user }) => {
+        return models.DirectMessage.findAll(
           {
             order: [['createdAt', 'ASC']],
             where: {
               teamId,
-              [op.or]: [
+              [models.Sequelize.Op.or]: [
                 {
-                  [op.and]: [
+                  [models.Sequelize.Op.and]: [
                     { receiverId: otherUserId },
                     { senderId: user.id },
                   ],
                 },
                 {
-                  [op.and]: [
+                  [models.Sequelize.Op.and]: [
                     { receiverId: user.id },
                     { senderId: otherUserId },
                   ],
@@ -33,7 +31,8 @@ export default {
             },
           },
           { raw: true },
-        ),
+        );
+      },
     ),
   },
   Mutation: {
@@ -41,14 +40,21 @@ export default {
       isAuthenticated,
       async (parent, args, { models, user }) => {
         try {
-          const message = await models.DirectMessage.create({
+          const directMessage = await models.DirectMessage.create({
             ...args,
             senderId: user.id,
           });
-          // pubsub.publish(EVENTS.MESSAGE.CREATED, {
-          //   channelId: args.channelId,
-          //   messageCreated: { ...message.dataValues },
-          // });
+          pubsub.publish(EVENTS.DIRECT_MESSAGE.DM_CREATED, {
+            teamId: args.teamId,
+            senderId: user.id,
+            receiverId: args.receiverId,
+            directMessageCreated: {
+              ...directMessage.dataValues,
+              sender: {
+                username: user.username,
+              },
+            },
+          });
           return true;
         } catch (error) {
           console.log(error);
@@ -58,10 +64,31 @@ export default {
     ),
   },
   Subscription: {
-    messageCreated: {
+    directMessageCreated: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
-        (payload, { channelId }) => payload.channelId === channelId,
+        () => pubsub.asyncIterator(EVENTS.DIRECT_MESSAGE.DM_CREATED),
+        (payload, { teamId, userId }, { user }) => {
+          console.log({ payload, teamId, userId, user });
+          console.log('alksdjflksdjfalksdjfaskljfalskdjf');
+          console.log(
+            payload.teamId === teamId,
+            payload.senderId === user.id,
+            payload.receiverId === userId,
+            payload.senderId === parseInt(userId),
+            payload.receiverId === user.id,
+            payload.teamId === teamId &&
+              ((payload.senderId === user.id &&
+                payload.receiverId === userId) ||
+                (payload.senderId === parseInt(userId) &&
+                  parseInt(payload.receiverId) === user.id)),
+          );
+          return (
+            payload.teamId === teamId &&
+            ((payload.senderId === user.id && payload.receiverId === userId) ||
+              (payload.senderId === parseInt(userId) &&
+                parseInt(payload.receiverId) === user.id))
+          );
+        },
       ),
     },
   },

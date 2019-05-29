@@ -21,9 +21,8 @@ const server = new ApolloServer({
   resolvers,
   context: async ({ req, connection }) => {
     if (connection) {
-      return {
-        models,
-      };
+      // check connection for metadata
+      return connection.context;
     }
 
     if (req) {
@@ -41,13 +40,13 @@ const server = new ApolloServer({
     }
   },
   subscriptions: {
-    onConnect: async ({ token }, webSocket) => {
+    onConnect: async ({ token }) => {
+      console.log('hello', token);
       if (token) {
         const user = await getUser(token);
         if (!user) {
           return { models };
         }
-
         return { models, user };
       }
 
