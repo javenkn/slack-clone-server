@@ -70,27 +70,38 @@ export default {
       isAuthenticated,
       async (parent, args, { models, user }) => {
         try {
-          const response = await models.sequelize.transaction(async () => {
-            const team = await models.Team.create({ ...args, owner: user.id });
-            await models.Member.create({
-              teamId: team.id,
-              userId: user.id,
-              admin: true,
-            });
-            await models.Channel.bulkCreate([
-              {
-                name: 'general',
-                public: true,
-                teamId: team.id,
-              },
-              {
-                name: 'random',
-                public: true,
-                teamId: team.id,
-              },
-            ]);
-            return team;
-          });
+          const response = await models.sequelize.transaction(
+            async transaction => {
+              const team = await models.Team.create(
+                { ...args },
+                { transaction },
+              );
+              await models.Member.create(
+                {
+                  teamId: team.id,
+                  userId: user.id,
+                  admin: true,
+                },
+                { transaction },
+              );
+              await models.Channel.bulkCreate(
+                [
+                  {
+                    name: 'general',
+                    public: true,
+                    teamId: team.id,
+                  },
+                  {
+                    name: 'random',
+                    public: true,
+                    teamId: team.id,
+                  },
+                ],
+                { transaction },
+              );
+              return team;
+            },
+          );
           return {
             ok: true,
             team: response,
