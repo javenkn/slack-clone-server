@@ -1,10 +1,11 @@
 export default `
   type Message {
     id: ID!
-    text: String!
+    text: String
     user: User!
     channel: Channel!
     createdAt: String!
+    url: String
   }
 
   type Subscription {
@@ -16,6 +17,6 @@ export default `
   }
 
   type Mutation {
-    createMessage(channelId: ID!, text: String!): Boolean!
+    createMessage(channelId: ID!, text: String, file: Upload): Boolean!
   }
 `;

@@ -54,6 +54,7 @@ const server = new ApolloServer({
     },
   },
 });
+
 const app = express();
 app.use(cors('localhost:3001'));
 

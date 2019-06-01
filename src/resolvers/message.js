@@ -1,5 +1,7 @@
 import { withFilter } from 'apollo-server';
 import { combineResolvers } from 'graphql-resolvers';
+import { createWriteStream } from 'fs';
+import path from 'path';
 
 import { isAuthenticated } from '../helpers/permissions';
 import pubsub, { EVENTS } from '../subscription';
@@ -18,10 +20,22 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, args, { models, user }) => {
+      async (parent, { file, ...args }, { models, user }) => {
         try {
+          const messageData = args;
+          const { createReadStream, filename } = await file;
+
+          await new Promise(res =>
+            createReadStream()
+              .pipe(
+                createWriteStream(path.join(__dirname, '../images', filename)),
+              )
+              .on('close', res),
+          );
+
           const message = await models.Message.create({
-            ...args,
+            ...messageData,
+            url: `http://localhost:3000/images/${filename}`,
             userId: user.id,
           });
           pubsub.publish(EVENTS.MESSAGE.CREATED, {
