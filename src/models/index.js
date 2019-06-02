@@ -20,6 +20,7 @@ const models = {
   Member: sequelize['import']('./member'),
   Message: sequelize['import']('./message'),
   DirectMessage: sequelize['import']('./direct-message'),
+  PrivateMember: sequelize['import']('./private-member'),
 };
 
 // loop through the models and for every model check if has an associate method
