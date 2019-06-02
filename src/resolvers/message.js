@@ -23,19 +23,25 @@ export default {
       async (parent, { file, ...args }, { models, user }) => {
         try {
           const messageData = args;
-          const { createReadStream, filename } = await file;
 
-          await new Promise(res =>
-            createReadStream()
-              .pipe(
-                createWriteStream(path.join(__dirname, '../images', filename)),
-              )
-              .on('close', res),
-          );
+          if (file) {
+            const { createReadStream, mimetype, filename } = await file;
+            await new Promise(res =>
+              createReadStream()
+                .pipe(
+                  createWriteStream(
+                    path.join(__dirname, '../images', filename),
+                  ),
+                )
+                .on('close', res),
+            );
+
+            messageData.url = `http://localhost:3000/images/${filename}`;
+            messageData.fileType = mimetype;
+          }
 
           const message = await models.Message.create({
             ...messageData,
-            url: `http://localhost:3000/images/${filename}`,
             userId: user.id,
           });
           pubsub.publish(EVENTS.MESSAGE.CREATED, {

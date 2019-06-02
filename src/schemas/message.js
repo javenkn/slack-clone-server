@@ -6,6 +6,7 @@ export default `
     channel: Channel!
     createdAt: String!
     url: String
+    fileType: String
   }
 
   type Subscription {

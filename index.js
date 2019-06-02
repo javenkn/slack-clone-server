@@ -57,6 +57,7 @@ const server = new ApolloServer({
 
 const app = express();
 app.use(cors('localhost:3001'));
+app.use('/images', express.static(path.join(__dirname, './src/images')));
 
 server.applyMiddleware({ app });
 
