@@ -10,11 +10,27 @@ export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
-      (parent, { channelId }, { models, user }) =>
-        models.Message.findAll(
+      async (parent, { channelId }, { models, user }) => {
+        const channel = await models.Channel.findOne(
+          { where: { id: channelId } },
+          { raw: true },
+        );
+
+        if (!channel.public) {
+          const member = await models.PrivateMember.findOne(
+            { where: { channelId, userId: user.id } },
+            { raw: true },
+          );
+          if (!member) {
+            throw new Error('Not Authorized.');
+          }
+        }
+
+        return models.Message.findAll(
           { order: [['createdAt', 'ASC']], where: { channelId } },
           { raw: true },
-        ),
+        );
+      },
     ),
   },
   Mutation: {

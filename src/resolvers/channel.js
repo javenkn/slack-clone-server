@@ -34,7 +34,7 @@ export default {
               if (!args.public) {
                 const members = args.members.filter(m => m !== user.id);
                 members.push(user.id);
-                const privateMembers = args.members.map(m => ({
+                const privateMembers = members.map(m => ({
                   userId: m,
                   channelId: channel.dataValues.id,
                 }));
