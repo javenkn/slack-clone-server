@@ -10,7 +10,7 @@ export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { channelId }, { models, user }) => {
+      async (parent, { channelId, offset }, { models, user }) => {
         const channel = await models.Channel.findOne(
           { where: { id: channelId } },
           { raw: true },
@@ -27,7 +27,12 @@ export default {
         }
 
         return models.Message.findAll(
-          { order: [['createdAt', 'ASC']], where: { channelId } },
+          {
+            order: [['createdAt', 'ASC']],
+            where: { channelId },
+            limit: 35,
+            offset,
+          },
           { raw: true },
         );
       },

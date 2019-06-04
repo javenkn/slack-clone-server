@@ -14,7 +14,7 @@ export default `
   }
 
   type Query {
-    messages(channelId: ID!): [Message!]!
+    messages(channelId: ID!, offset: Int!): [Message!]!
   }
 
   type Mutation {
