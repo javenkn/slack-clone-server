@@ -1,10 +1,12 @@
 export default `
+  scalar DateTime
+
   type Message {
     id: ID!
     text: String
     user: User!
     channel: Channel!
-    createdAt: String!
+    createdAt: DateTime!
     url: String
     fileType: String
   }
@@ -14,7 +16,7 @@ export default `
   }
 
   type Query {
-    messages(channelId: ID!, offset: Int!): [Message!]!
+    messages(channelId: ID!, cursor: String): [Message!]!
   }
 
   type Mutation {

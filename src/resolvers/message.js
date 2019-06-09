@@ -10,7 +10,7 @@ export default {
   Query: {
     messages: combineResolvers(
       isAuthenticated,
-      async (parent, { channelId, offset }, { models, user }) => {
+      async (parent, { channelId, cursor }, { models, user }) => {
         const channel = await models.Channel.findOne(
           { where: { id: channelId } },
           { raw: true },
@@ -26,15 +26,23 @@ export default {
           }
         }
 
-        return models.Message.findAll(
-          {
-            order: [['createdAt', 'ASC']],
-            where: { channelId },
-            limit: 35,
-            offset,
-          },
-          { raw: true },
-        );
+        /* Pagination */
+        /* Offset: [0, 1, ...., 1,000,000] going through each one */
+        /* Cursor: taking a value and grabbing everything before/after */
+
+        const options = {
+          order: [['createdAt', 'DESC']],
+          where: { channelId },
+          limit: 35,
+        };
+
+        if (cursor) {
+          options.where.createdAt = {
+            [models.op.lt]: cursor,
+          };
+        }
+
+        return models.Message.findAll(options, { raw: true });
       },
     ),
   },
