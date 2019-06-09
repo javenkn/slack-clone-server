@@ -5,9 +5,11 @@ import http from 'http';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import cors from 'cors';
 import 'dotenv/config';
+import DataLoader from 'dataloader';
 
 import models from './src/models';
 import getUser from './src/helpers/getUser';
+import { channelBatcher } from './src/helpers/batchFunctions';
 
 const SECRET = process.env.SECRET;
 
@@ -36,12 +38,12 @@ const server = new ApolloServer({
         models,
         user,
         SECRET,
+        channelLoader: new DataLoader(ids => channelBatcher(ids, models, user)),
       };
     }
   },
   subscriptions: {
     onConnect: async ({ token }) => {
-      console.log('hello', token);
       if (token) {
         const user = await getUser(token);
         if (!user) {
