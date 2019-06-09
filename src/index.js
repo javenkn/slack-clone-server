@@ -7,15 +7,15 @@ import cors from 'cors';
 import 'dotenv/config';
 import DataLoader from 'dataloader';
 
-import models from './src/models';
-import getUser from './src/helpers/getUser';
-import { channelBatcher } from './src/helpers/batchFunctions';
+import models from './models';
+import getUser from './helpers/getUser';
+import { channelBatcher } from './helpers/batchFunctions';
 
 const SECRET = process.env.SECRET;
 
-const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './src/schemas')));
+const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schemas')));
 const resolvers = mergeResolvers(
-  fileLoader(path.join(__dirname, './src/resolvers')),
+  fileLoader(path.join(__dirname, './resolvers')),
 );
 
 const server = new ApolloServer({
@@ -39,6 +39,7 @@ const server = new ApolloServer({
         user,
         SECRET,
         channelLoader: new DataLoader(ids => channelBatcher(ids, models, user)),
+        serverUrl: `${req.protocol}://${req.get('host')}`,
       };
     }
   },
@@ -59,7 +60,7 @@ const server = new ApolloServer({
 
 const app = express();
 app.use(cors('localhost:3001'));
-app.use('/images', express.static(path.join(__dirname, './src/images')));
+app.use('/images', express.static(path.join(__dirname, '../images')));
 
 server.applyMiddleware({ app });
 

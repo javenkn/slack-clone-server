@@ -49,7 +49,7 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { file, ...args }, { models, user }) => {
+      async (parent, { file, ...args }, { models, user, serverUrl }) => {
         try {
           const messageData = args;
 
@@ -59,13 +59,13 @@ export default {
               createReadStream()
                 .pipe(
                   createWriteStream(
-                    path.join(__dirname, '../images', filename),
+                    path.join(__dirname, '../../images', filename),
                   ),
                 )
                 .on('close', res),
             );
 
-            messageData.url = `http://localhost:3000/images/${filename}`;
+            messageData.url = `${serverUrl}/images/${filename}`;
             messageData.fileType = mimetype;
           }
 
