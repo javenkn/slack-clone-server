@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  redis:
+    image: redis
+    networks:
+      - webnet
+  db:
+    image: postgres
+    environment:
+      DATABASE_PASSWORD: postgres
+      DATABASE_USER: postgres
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+  web:
+    image: slack-clone-server
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+      - redis
+    networks:
+      - webnet
+    environment:
+      DATABASE_USER: postgres
+      DB_HOST: db
+      REDIS_HOST: redis
+      SECRET: ${SECRET}
+    command: ['./wait-for-it.sh', 'db:5432', '--', 'node', 'index.js']
+networks:
+  webnet:

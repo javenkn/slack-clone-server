@@ -7,6 +7,7 @@ const sequelize = new Sequelize(
   process.env.DATABASE_PASSWORD,
   {
     dialect: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
     define: {
       underscored: true,
     },
@@ -19,6 +20,7 @@ const models = {
   Team: sequelize['import']('./team'),
   Member: sequelize['import']('./member'),
   Message: sequelize['import']('./message'),
+  DirectMessage: sequelize['import']('./direct-message'),
   PrivateMember: sequelize['import']('./private-member'),
 };
 

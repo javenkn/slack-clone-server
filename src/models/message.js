@@ -9,7 +9,7 @@ export default (sequelize, DataTypes) => {
     {
       indexes: [
         {
-          fields: ['createdAt'],
+          fields: ['created_at'],
         },
       ],
     },
