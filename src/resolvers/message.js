@@ -1,6 +1,6 @@
 import { withFilter } from 'apollo-server';
 import { combineResolvers } from 'graphql-resolvers';
-import { createWriteStream } from 'fs';
+import { createWriteStream, unlinkSync } from 'fs';
 import path from 'path';
 
 import { isAuthenticated } from '../helpers/permissions';
@@ -49,23 +49,28 @@ export default {
   Mutation: {
     createMessage: combineResolvers(
       isAuthenticated,
-      async (parent, { file, ...args }, { models, user, serverUrl }) => {
+      async (parent, { file, ...args }, { models, user }) => {
         try {
           const messageData = args;
 
           if (file) {
             const { createReadStream, mimetype, filename } = await file;
-            await new Promise(res =>
-              createReadStream()
-                .pipe(
-                  createWriteStream(
-                    path.join(__dirname, '../../images', filename),
-                  ),
-                )
-                .on('close', res),
+            const filePath = path.join(__dirname, '../../files', filename);
+            const stream = createReadStream();
+            await new Promise((resolve, reject) =>
+              stream
+                .on('error', error => {
+                  if (stream.truncated)
+                    // Delete the truncated file.
+                    unlinkSync(filePath);
+                  reject(error);
+                })
+                .pipe(createWriteStream(filePath))
+                .on('error', error => reject(error))
+                .on('finish', resolve),
             );
-
-            messageData.url = `${serverUrl}/images/${filename}`;
+            messageData.url = `${process.env.SERVER_URL ||
+              'http://localhost:3000'}/files/${filename}`;
             messageData.fileType = mimetype;
           }
 

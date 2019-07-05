@@ -6,6 +6,7 @@ import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import cors from 'cors';
 import 'dotenv/config';
 import DataLoader from 'dataloader';
+import { existsSync, mkdirSync } from 'fs';
 
 import models from './models';
 import getUser from './helpers/getUser';
@@ -17,6 +18,9 @@ const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schemas')));
 const resolvers = mergeResolvers(
   fileLoader(path.join(__dirname, './resolvers')),
 );
+
+existsSync(path.join(__dirname, '../files')) ||
+  mkdirSync(path.join(__dirname, '../files'));
 
 const server = new ApolloServer({
   typeDefs,
@@ -59,8 +63,9 @@ const server = new ApolloServer({
 });
 
 const app = express();
-app.use(cors('localhost:3001'));
-app.use('/images', express.static(path.join(__dirname, '../images')));
+
+app.use(cors());
+app.use('/files', express.static(path.join(__dirname, '../files')));
 
 server.applyMiddleware({ app });
 
