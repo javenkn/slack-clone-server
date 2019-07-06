@@ -18,7 +18,7 @@ services:
     ports:
       - '3030:5432'
   web:
-    image: slack-clone-server
+    image: javenkn/slack-clone-server:latest
     depends_on:
       - db
       - redis
