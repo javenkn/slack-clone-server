@@ -99,7 +99,7 @@ export default {
     },
   },
   Message: {
-    user: ({ userId }, args, { models }) =>
-      models.User.findOne({ where: { id: userId } }),
+    user: ({ userId }, args, { userLoader, models }) =>
+      userLoader.load(userId, models),
   },
 };

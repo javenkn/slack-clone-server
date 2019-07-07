@@ -18,6 +18,7 @@ export const channelBatcher = async (ids, models, user) => {
     },
   );
 
+  // group by team
   const data = results.reduce((dataAcc, result) => {
     if (dataAcc[result.team_id]) {
       dataAcc[result.team_id].push(result);
@@ -27,5 +28,34 @@ export const channelBatcher = async (ids, models, user) => {
     return dataAcc;
   }, {});
 
+  // [[name: 'general'], [], [], ...]
+  return ids.map(id => data[id]);
+};
+
+/**
+ * Returns array of users
+ * @param {Int[]} ids
+ * @param {*} models
+ */
+export const userBatcher = async (ids, models) => {
+  const results = await models.sequelize.query(
+    `
+  select *
+  from users as u
+  where u.id in (:userIds)`,
+    {
+      replacements: { userIds: ids },
+      model: models.User,
+      raw: true,
+    },
+  );
+
+  // group by user id
+  const data = results.reduce((dataAcc, result) => {
+    dataAcc[result.id] = result;
+    return dataAcc;
+  }, {});
+
+  // [{id: 1, username: 'admin'}, {}, {}, ...]
   return ids.map(id => data[id]);
 };

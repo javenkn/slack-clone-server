@@ -10,7 +10,7 @@ import { existsSync, mkdirSync } from 'fs';
 
 import models from './models';
 import getUser from './helpers/getUser';
-import { channelBatcher } from './helpers/batchFunctions';
+import { channelBatcher, userBatcher } from './helpers/batchFunctions';
 
 const SECRET = process.env.SECRET;
 
@@ -43,6 +43,7 @@ const server = new ApolloServer({
         user,
         SECRET,
         channelLoader: new DataLoader(ids => channelBatcher(ids, models, user)),
+        userLoader: new DataLoader(ids => userBatcher(ids, models)),
         serverUrl: `${req.protocol}://${req.get('host')}`,
       };
     }
@@ -54,7 +55,11 @@ const server = new ApolloServer({
         if (!user) {
           return { models };
         }
-        return { models, user };
+        return {
+          models,
+          user,
+          userLoader: new DataLoader(ids => userBatcher(ids, models)),
+        };
       }
 
       return { models };
