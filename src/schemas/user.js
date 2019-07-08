@@ -4,6 +4,7 @@ export default `
     username: String!
     email: String!
     teams: [Team!]! 
+    color: String!
   }
 
   type Query {

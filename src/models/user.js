@@ -37,6 +37,9 @@ export default (sequelize, DataTypes) => {
           },
         },
       },
+      color: {
+        type: DataTypes.STRING,
+      },
     },
     {
       hooks: {

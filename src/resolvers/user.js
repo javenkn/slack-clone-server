@@ -17,8 +17,12 @@ export default {
     login: (parent, { email, password }, { models, SECRET }) =>
       tryLogin(email, password, models, SECRET),
     register: async (parent, args, { models }) => {
+      const randomColor = Math.floor(Math.random() * 16777215).toString(16);
       try {
-        const user = await models.User.create(args);
+        const user = await models.User.create({
+          ...args,
+          color: randomColor === 'ffffff' ? '000000' : randomColor,
+        });
         return {
           ok: true,
           user,
