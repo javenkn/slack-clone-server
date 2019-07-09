@@ -40,7 +40,7 @@ export default {
           {
             where: {
               id: {
-                [models.Sequelize.Op.in]: members,
+                [models.Sequelize.Op.in]: allMembers,
               },
             },
           },

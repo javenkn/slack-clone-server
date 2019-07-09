@@ -50,7 +50,6 @@ const server = new ApolloServer({
   },
   subscriptions: {
     onConnect: async ({ token }) => {
-      console.log('subscribed');
       if (token) {
         const user = await getUser(token);
         if (!user) {
