@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 export const createToken = async (user, secret) => {
   const { id, username } = user;
   return jwt.sign({ id, username }, secret, {
-    expiresIn: '1h',
+    expiresIn: '1d',
   });
 };
 
